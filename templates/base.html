@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}{{ restaurant_name }}{% endblock %}</title>
+<style>
+  :root{
+    --bg:#17181a; --panel:#1f2123; --panel-2:#26292c; --line:#34383c;
+    --brass:#cfa438; --red:#c0392b; --green:#3f8f5f;
+    --text:#e9e6df; --muted:#8b8f93; --radius:6px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,Segoe UI,Roboto,sans-serif;}
+  header{display:flex;align-items:center;justify-content:space-between;padding:16px 26px;border-bottom:1px solid var(--line);flex-wrap:wrap;gap:10px;}
+  header h1{margin:0;font-size:20px;}
+  nav a{color:#c7cbd1;text-decoration:none;margin-left:16px;font-size:14px;font-weight:500;}
+  nav a:hover{color:var(--brass);}
+  main{max-width:1000px;margin:26px auto;padding:0 20px;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:18px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;}
+  .stat{text-align:center;padding:10px;border-radius:var(--radius);background:var(--panel-2);}
+  .stat .num{font-size:20px;font-weight:700;color:var(--brass);}
+  .stat .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;}
+  table{width:100%;border-collapse:collapse;}
+  th,td{padding:9px 8px;border-bottom:1px solid var(--line);text-align:left;font-size:14px;}
+  th{color:var(--muted);font-size:11px;text-transform:uppercase;}
+  input,select{background:var(--panel-2);border:1px solid var(--line);color:var(--text);padding:8px 10px;border-radius:var(--radius);font-size:14px;}
+  .btn{display:inline-block;padding:8px 14px;border-radius:var(--radius);border:none;background:var(--brass);color:#1a1a1a;font-weight:600;font-size:13px;text-decoration:none;cursor:pointer;}
+  .btn:hover{filter:brightness(1.1);}
+  .btn-ghost{background:transparent;color:var(--text);border:1px solid var(--line);}
+  .btn-red{background:var(--red);color:white;}
+  .btn-small{padding:5px 10px;font-size:12px;}
+  .badge{padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;}
+  .badge-Open{background:rgba(207,164,56,.15);color:var(--brass);border:1px solid var(--brass);}
+  .badge-Billed{background:rgba(63,143,95,.15);color:var(--green);border:1px solid var(--green);}
+  .badge-Cancelled{background:rgba(192,57,43,.15);color:var(--red);border:1px solid var(--red);}
+  .flash{padding:10px 14px;border-radius:var(--radius);margin-bottom:12px;font-size:14px;}
+  .flash-success{background:rgba(63,143,95,.12);color:#a9dcbb;border:1px solid var(--green);}
+  .flash-error{background:rgba(192,57,43,.12);color:#f0a8a0;border:1px solid var(--red);}
+  .field{margin-bottom:12px;display:flex;flex-direction:column;gap:5px;}
+  .field label{font-size:12px;color:var(--muted);}
+  form.inline{display:inline;}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px;}
+</style>
+</head>
+<body>
+<header>
+  <h1>🍽️ {{ restaurant_name }}</h1>
+  <nav>
+    <a href="{{ url_for('index') }}">Dashboard</a>
+    <a href="{{ url_for('add_menu_item') }}">Add Menu Item</a>
+    <a href="{{ url_for('summary') }}">Sales Summary</a>
+    <a href="{{ url_for('export_csv') }}">Export CSV</a>
+  </nav>
+</header>
+<main>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="flash flash-{{ 'error' if category=='error' else 'success' }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</main>
+</body>
+</html>

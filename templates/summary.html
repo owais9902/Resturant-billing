@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Sales Summary - Restaurant Billing{% endblock %}
+{% block content %}
+
+<div class="card">
+  <h2 style="margin-top:0;">Sales Summary</h2>
+  <div class="grid">
+    <div class="stat"><div class="num">{{ summary.billed_orders }}</div><div class="lbl">Billed Orders</div></div>
+    <div class="stat"><div class="num">{{ summary.open_orders }}</div><div class="lbl">Open Orders</div></div>
+    <div class="stat"><div class="num">{{ summary.cancelled_orders }}</div><div class="lbl">Cancelled Orders</div></div>
+    <div class="stat"><div class="num">${{ "%.2f"|format(summary.total_revenue) }}</div><div class="lbl">Total Revenue</div></div>
+    <div class="stat"><div class="num">${{ "%.2f"|format(summary.average_order_value) }}</div><div class="lbl">Avg Order Value</div></div>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lazeez-e-Hyderabadi — Restaurant Billing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Work+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#17181a;
+    --panel:#1f2123;
+    --panel-2:#26292c;
+    --line:#34383c;
+    --paper:#f5efe0;
+    --paper-shadow:#d8cfb5;
+    --brass:#cfa438;
+    --brass-dark:#a9822b;
+    --red:#c0392b;
+    --green:#3f8f5f;
+    --ink:#2a2721;
+    --text:#e9e6df;
+    --muted:#8b8f93;
+    --radius:4px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Work Sans',sans-serif;
+    min-height:100vh;
+  }
+  ::selection{background:var(--brass);color:#1a1a1a;}
+
+  /* ---------- Header ---------- */
+  header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:18px 28px;
+    border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg,#1c1e20,#17181a);
+    flex-wrap:wrap;
+    gap:12px;
+  }
+  .brand{display:flex;align-items:center;gap:12px;}
+  .brand .mark{
+    width:38px;height:38px;border-radius:50%;
+    background:var(--brass);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Bebas Neue',sans-serif;
+    font-size:20px;color:#1a1a1a;
+    letter-spacing:0.5px;
+  }
+  .brand h1{
+    font-family:'Bebas Neue',sans-serif;
+    font-size:28px;
+    letter-spacing:1.5px;
+    margin:0;
+    color:var(--text);
+  }
+  .brand .tag{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:2px;
+    color:var(--muted);
+    margin-top:-2px;
+  }
+  .clock{
+    font-family:'Space Mono',monospace;
+    font-size:13px;
+    color:var(--muted);
+    text-align:right;
+  }
+  .clock .status-dot{
+    display:inline-block;width:7px;height:7px;border-radius:50%;
+    background:var(--green);margin-right:6px;
+    box-shadow:0 0 6px var(--green);
+  }
+
+  /* ---------- Layout ---------- */
+  main{
+    display:grid;
+    grid-template-columns:1fr 1.15fr 1fr;
+    gap:1px;
+    background:var(--line);
+    min-height:calc(100vh - 78px);
+  }
+  @media (max-width: 1000px){
+    main{grid-template-columns:1fr;}
+  }
+  .col{
+    background:var(--bg);
+    padding:20px;
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+    overflow-y:auto;
+  }
+  .col-header{
+    display:flex;align-items:baseline;justify-content:space-between;
+    border-bottom:2px solid var(--brass);
+    padding-bottom:8px;
+  }
+  .col-header h2{
+    font-family:'Bebas Neue',sans-serif;
+    font-size:22px;letter-spacing:1px;margin:0;
+    color:var(--text);
+  }
+  .col-header .count{
+    font-family:'Space Mono',monospace;
+    font-size:12px;color:var(--muted);
+  }
+
+  /* ---------- Cards / Panels ---------- */
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:14px;
+  }
+  .field{margin-bottom:10px;display:flex;flex-direction:column;gap:5px;}
+  .field label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);}
+  .field-row{display:flex;gap:8px;}
+  .field-row .field{flex:1;}
+  input[type=text],input[type=number],select{
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    color:var(--text);
+    padding:9px 10px;
+    border-radius:var(--radius);
+    font-family:'Work Sans',sans-serif;
+    font-size:14px;
+    width:100%;
+  }
+  input:focus,select:focus,button:focus-visible{
+    outline:2px solid var(--brass);
+    outline-offset:1px;
+  }
+  select{ appearance:none; }
+
+  button{
+    cursor:pointer;
+    border:none;
+    border-radius:var(--radius);
+    font-family:'Work Sans',sans-serif;
+    font-weight:600;
+    font-size:13px;
+    padding:9px 14px;
+    transition:transform 0.06s ease, filter 0.15s ease;
+  }
+  button:active{transform:translateY(1px);}
+  .btn-brass{ background:var(--brass); color:#1a1a1a; }
+  .btn-brass:hover{ filter:brightness(1.1); }
+  .btn-ghost{ background:transparent; color:var(--text); border:1px solid var(--line); }
+  .btn-ghost:hover{ border-color:var(--brass); color:var(--brass); }
+  .btn-red{ background:transparent; color:var(--red); border:1px solid var(--red); }
+  .btn-red:hover{ background:var(--red); color:white; }
+  .btn-green{ background:var(--green); color:#0e1a13; }
+  .btn-green:hover{ filter:brightness(1.1); }
+  .btn-small{ padding:5px 9px; font-size:11px; }
+  .btn-block{ width:100%; }
+  button:disabled{ opacity:0.35; cursor:not-allowed; filter:none !important; }
+
+  .error-msg{
+    background:rgba(192,57,43,0.12);
+    border:1px solid var(--red);
+    color:#f0a8a0;
+    padding:8px 10px;
+    border-radius:var(--radius);
+    font-size:13px;
+    margin-bottom:10px;
+  }
+  .success-msg{
+    background:rgba(63,143,95,0.12);
+    border:1px solid var(--green);
+    color:#a9dcbb;
+    padding:8px 10px;
+    border-radius:var(--radius);
+    font-size:13px;
+    margin-bottom:10px;
+  }
+
+  /* ---------- Menu Board (left column) ---------- */
+  .menu-item-card{
+    display:flex;justify-content:space-between;align-items:center;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:10px 12px;
+    gap:8px;
+  }
+  .menu-item-card:hover{ border-color:var(--brass); }
+  .menu-item-info{ display:flex; flex-direction:column; }
+  .menu-item-info .name{ font-weight:600; font-size:14px; }
+  .menu-item-info .meta{ font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; }
+  .menu-item-price{
+    font-family:'Space Mono',monospace;
+    color:var(--brass);
+    font-weight:700;
+    font-size:14px;
+    margin-right:6px;
+  }
+  .category-pill{
+    display:inline-block;
+    padding:1px 7px;
+    border-radius:20px;
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    background:var(--panel-2);
+    color:var(--muted);
+    border:1px solid var(--line);
+  }
+  .toolbar{ display:flex; gap:8px; flex-wrap:wrap; }
+  .toolbar select, .toolbar input{ flex:1; min-width:110px; }
+
+  /* ---------- Ticket (order builder, center) ---------- */
+  .no-order{
+    text-align:center;
+    color:var(--muted);
+    padding:40px 10px;
+    font-size:14px;
+    border:1px dashed var(--line);
+    border-radius:var(--radius);
+  }
+  .table-select-row{ display:flex; gap:8px; align-items:flex-end; }
+  .table-select-row .field{ flex:1; }
+
+  .ticket-active-header{
+    display:flex;justify-content:space-between;align-items:center;
+    font-family:'Bebas Neue',sans-serif;
+    font-size:20px;
+    letter-spacing:1px;
+  }
+  .status-badge{
+    font-family:'Work Sans',sans-serif;
+    font-size:10px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    padding:3px 9px;
+    border-radius:20px;
+  }
+  .status-Open{ background:rgba(207,164,56,0.15); color:var(--brass); border:1px solid var(--brass); }
+  .status-Billed{ background:rgba(63,143,95,0.15); color:var(--green); border:1px solid var(--green); }
+  .status-Cancelled{ background:rgba(192,57,43,0.15); color:var(--red); border:1px solid var(--red); }
+
+  .line-item{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:8px 0;
+    border-bottom:1px solid var(--line);
+    font-size:13px;
+  }
+  .line-item:last-child{ border-bottom:none; }
+  .line-item .li-name{ flex:1; }
+  .qty-stepper{ display:flex; align-items:center; gap:6px; }
+  .qty-stepper button{
+    width:22px;height:22px;padding:0;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--panel-2); color:var(--text); border:1px solid var(--line);
+    font-size:14px; line-height:1;
+  }
+  .qty-stepper button:hover{ border-color:var(--brass); color:var(--brass); }
+  .qty-stepper .qty-val{ font-family:'Space Mono',monospace; min-width:20px; text-align:center; }
+  .li-subtotal{ font-family:'Space Mono',monospace; width:70px; text-align:right; color:var(--text); }
+  .li-remove{
+    background:none;border:none;color:var(--muted);
+    font-size:15px;cursor:pointer;padding:0 0 0 8px;
+  }
+  .li-remove:hover{ color:var(--red); }
+
+  .totals-block{
+    font-family:'Space Mono',monospace;
+    font-size:13px;
+  }
+  .totals-row{ display:flex; justify-content:space-between; padding:4px 0; }
+  .totals-row.grand{
+    font-size:17px; font-weight:700; color:var(--brass);
+    border-top:2px solid var(--brass);
+    margin-top:6px; padding-top:8px;
+  }
+  .discount-tax-row{ display:flex; gap:8px; }
+  .discount-tax-row .field{ flex:1; }
+
+  /* ---------- Receipt print animation ---------- */
+  .print-slot{
+    height:8px;
+    background:linear-gradient(180deg,#0d0e0f,#26292c);
+    border-radius:4px;
+    box-shadow:inset 0 2px 4px rgba(0,0,0,0.6);
+    margin-bottom:-6px;
+    position:relative;
+    z-index:2;
+  }
+  .receipt-wrap{
+    overflow:hidden;
+    max-height:0;
+    transition:max-height 0.6s cubic-bezier(.2,.8,.2,1);
+  }
+  .receipt-wrap.printed{ max-height:600px; }
+  .receipt{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Space Mono',monospace;
+    font-size:12px;
+    line-height:1.55;
+    padding:18px 16px 22px;
+    margin-top:10px;
+    box-shadow:0 8px 18px rgba(0,0,0,0.35);
+    transform:translateY(-16px);
+    opacity:0;
+    transition:transform 0.6s cubic-bezier(.2,.8,.2,1), opacity 0.5s ease;
+    clip-path:polygon(
+      0% 0%,100% 0%,100% 94%,
+      95% 100%,90% 94%,85% 100%,80% 94%,75% 100%,70% 94%,65% 100%,
+      60% 94%,55% 100%,50% 94%,45% 100%,40% 94%,35% 100%,30% 94%,
+      25% 100%,20% 94%,15% 100%,10% 94%,5% 100%,0% 94%
+    );
+  }
+  .receipt-wrap.printed .receipt{ transform:translateY(0); opacity:1; }
+  .receipt .center{ text-align:center; }
+  .receipt .r-title{ font-weight:700; font-size:14px; letter-spacing:2px; }
+  .receipt hr{ border:none; border-top:1px dashed var(--ink); margin:8px 0; }
+  .receipt .r-line{ display:flex; justify-content:space-between; white-space:pre; }
+  .receipt .r-total{ font-weight:700; font-size:14px; }
+
+  /* ---------- Ticket rail (right column: history + sales) ---------- */
+  .stats-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:8px;
+  }
+  .stat-box{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:10px;
+    text-align:center;
+  }
+  .stat-box .num{ font-family:'Space Mono',monospace; font-size:19px; font-weight:700; color:var(--brass); }
+  .stat-box .lbl{ font-size:10px; text-transform:uppercase; letter-spacing:0.5px; color:var(--muted); }
+
+  .order-card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-left:3px solid var(--muted);
+    border-radius:var(--radius);
+    padding:10px 12px;
+    cursor:pointer;
+    transition:border-color 0.15s ease;
+  }
+  .order-card:hover{ border-left-color:var(--brass); }
+  .order-card.sel{ border-left-color:var(--brass); background:var(--panel-2); }
+  .order-card.st-Open{ border-left-color:var(--brass); }
+  .order-card.st-Billed{ border-left-color:var(--green); }
+  .order-card.st-Cancelled{ border-left-color:var(--red); opacity:0.6; }
+  .order-card-top{ display:flex; justify-content:space-between; font-size:13px; font-weight:600; }
+  .order-card-bottom{ display:flex; justify-content:space-between; font-size:11px; color:var(--muted); margin-top:3px; }
+  .order-card .oc-total{ font-family:'Space Mono',monospace; color:var(--text); }
+
+  .empty-hint{
+    text-align:center;color:var(--muted);font-size:13px;padding:20px 10px;
+    border:1px dashed var(--line); border-radius:var(--radius);
+  }
+
+  ::-webkit-scrollbar{ width:8px; }
+  ::-webkit-scrollbar-thumb{ background:var(--line); border-radius:4px; }
+  ::-webkit-scrollbar-track{ background:transparent; }
+
+  @media (prefers-reduced-motion: reduce){
+    .receipt, .receipt-wrap{ transition:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="mark">L</div>
+    <div>
+      <h1>LAZEEZ-E-HYDERABADI</h1>
+      <div class="tag">Restaurant Billing</div>
+    </div>
+  </div>
+  <div class="clock"><span class="status-dot"></span><span id="clockText">—</span></div>
+</header>
+
+<main>
+  <!-- ================= LEFT: MENU BOARD ================= -->
+  <section class="col" id="colMenu">
+    <div class="col-header">
+      <h2>Menu Board</h2>
+      <span class="count" id="menuCount">0 items</span>
+    </div>
+
+    <div class="panel">
+      <div id="menuFormMsg"></div>
+      <div class="field">
+        <label for="miName">Item name</label>
+        <input type="text" id="miName" placeholder="e.g. Margherita Pizza">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="miPrice">Price ($)</label>
+          <input type="number" id="miPrice" placeholder="12.50" step="0.01" min="0">
+        </div>
+        <div class="field">
+          <label for="miCategory">Category</label>
+          <select id="miCategory">
+            <option>Starter</option>
+            <option selected>Main</option>
+            <option>Dessert</option>
+            <option>Beverage</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-brass btn-block" onclick="addMenuItem()">+ Add to Menu</button>
+    </div>
+
+    <div class="toolbar">
+      <input type="text" id="menuSearch" placeholder="Search menu…" oninput="renderMenu()">
+      <select id="menuCategoryFilter" onchange="renderMenu()">
+        <option value="">All categories</option>
+        <option>Starter</option><option>Main</option><option>Dessert</option><option>Beverage</option><option>Other</option>
+      </select>
+    </div>
+
+    <div id="menuList" style="display:flex;flex-direction:column;gap:8px;"></div>
+  </section>
+
+  <!-- ================= CENTER: CURRENT TICKET ================= -->
+  <section class="col" id="colTicket">
+    <div class="col-header">
+      <h2>Current Ticket</h2>
+      <span class="count" id="ticketStatusCount"></span>
+    </div>
+
+    <div class="panel table-select-row">
+      <div class="field">
+        <label for="tableInput">Table number</label>
+        <input type="text" id="tableInput" placeholder="e.g. T04">
+      </div>
+      <button class="btn-brass" onclick="startOrder()">New Order</button>
+    </div>
+
+    <div id="ticketFormMsg"></div>
+
+    <div id="ticketBody"><div class="no-order">No active ticket. Start a new order for a table above, or select an open order from the Ticket Rail →</div></div>
+  </section>
+
+  <!-- ================= RIGHT: TICKET RAIL ================= -->
+  <section class="col" id="colRail">
+    <div class="col-header">
+      <h2>Ticket Rail</h2>
+      <span class="count" id="orderCount">0 orders</span>
+    </div>
+
+    <div class="stats-grid" id="statsGrid"></div>
+
+    <div class="toolbar">
+      <select id="statusFilter" onchange="renderOrders()">
+        <option value="">All statuses</option>
+        <option>Open</option><option>Billed</option><option>Cancelled</option>
+      </select>
+      <select id="orderSort" onchange="renderOrders()">
+        <option value="recent">Most recent</option>
+        <option value="total-desc">Total: high → low</option>
+        <option value="total-asc">Total: low → high</option>
+      </select>
+    </div>
+
+    <div id="ordersList" style="display:flex;flex-direction:column;gap:8px;"></div>
+  </section>
+</main>
+
+<script>
+/* =====================================================================
+   THE PASS — Restaurant Billing System (client-side demo)
+   Vanilla JS. All state lives in memory for this browser session only
+   (no backend, no localStorage) — refreshing the page resets the data,
+   by design, so this stays a pure front-end demonstration.
+   ===================================================================== */
+
+const VALID_CATEGORIES = ["Starter","Main","Dessert","Beverage","Other"];
+
+let menu = [];          // {id, name, price, category}
+let orders = [];        // {id, table, items:[{itemId,name,unitPrice,qty}], discount, tax, status, createdAt}
+let nextMenuId = 1;
+let nextOrderId = 1;
+let activeOrderId = null;
+
+/* ---------------- Seed data: Lazeez-e-Hyderabadi menu ---------------- */
+function seed(){
+  // Starters / Kebabs
+  addMenuItemRaw("Chicken Seekh Kebab", 210, "Starter");
+  addMenuItemRaw("Mutton Seekh Kebab", 240, "Starter");
+  addMenuItemRaw("Chicken 65", 200, "Starter");
+  addMenuItemRaw("Mutton Fry", 260, "Starter");
+
+  // Biryani
+  addMenuItemRaw("Hyderabadi Chicken Biryani", 250, "Main");
+  addMenuItemRaw("Hyderabadi Mutton Biryani", 320, "Main");
+  addMenuItemRaw("Vegetable Biryani", 180, "Main");
+  addMenuItemRaw("Egg Biryani", 150, "Main");
+
+  // Chicken curries / dishes
+  addMenuItemRaw("Chicken Curry", 220, "Main");
+  addMenuItemRaw("Chicken Korma", 240, "Main");
+  addMenuItemRaw("Butter Chicken", 270, "Main");
+  addMenuItemRaw("Chicken Tikka Masala", 260, "Main");
+  addMenuItemRaw("Chicken Chettinad", 250, "Main");
+
+  // Mutton curries / dishes
+  addMenuItemRaw("Mutton Curry", 280, "Main");
+  addMenuItemRaw("Mutton Korma", 300, "Main");
+  addMenuItemRaw("Mutton Rogan Josh", 320, "Main");
+  addMenuItemRaw("Mutton Kheema", 260, "Main");
+  addMenuItemRaw("Mutton Chukka", 290, "Main");
+
+  // Shawarma
+  addMenuItemRaw("Chicken Shawarma Roll", 150, "Main");
+  addMenuItemRaw("Mutton Shawarma Roll", 180, "Main");
+  addMenuItemRaw("Chicken Shawarma Plate", 220, "Main");
+
+  // Desserts
+  addMenuItemRaw("Double Ka Meetha", 90, "Dessert");
+  addMenuItemRaw("Qubani Ka Meetha", 100, "Dessert");
+
+  // Cold Drinks / Beverages
+  addMenuItemRaw("Coca-Cola", 40, "Beverage");
+  addMenuItemRaw("Sprite", 40, "Beverage");
+  addMenuItemRaw("Mango Lassi", 60, "Beverage");
+  addMenuItemRaw("Sweet Lassi", 50, "Beverage");
+  addMenuItemRaw("Masala Soda", 45, "Beverage");
+
+  const o1 = createOrderRaw("T04", 5);
+  addItemToOrderRaw(o1, 5, 2);   // Hyderabadi Chicken Biryani x2
+  addItemToOrderRaw(o1, 24, 2);  // Coca-Cola x2
+  o1.discount = 10;
+  billOrderRaw(o1);
+
+  const o2 = createOrderRaw("T07", 5);
+  addItemToOrderRaw(o2, 6, 1);   // Hyderabadi Mutton Biryani
+  addItemToOrderRaw(o2, 19, 2);  // Chicken Shawarma Roll x2
+}
+
+/* ---------------- Validation helpers ---------------- */
+function validateName(name){
+  if(!name || !name.trim()) throw new Error("Item name cannot be empty.");
+  return name.trim();
+}
+function validatePrice(price){
+  const p = parseFloat(price);
+  if(isNaN(p)) throw new Error("Price must be a number.");
+  if(p <= 0) throw new Error("Price must be greater than 0.");
+  if(p > 100000) throw new Error("Price seems unrealistic (must be ≤ 100000).");
+  return Math.round(p*100)/100;
+}
+function validateCategory(cat){
+  if(!VALID_CATEGORIES.includes(cat)) throw new Error("Category must be one of " + VALID_CATEGORIES.join(", ") + ".");
+  return cat;
+}
+function validateTable(table){
+  if(!table || !table.trim()) throw new Error("Table number cannot be empty.");
+  return table.trim().toUpperCase();
+}
+function validatePercent(value,label){
+  const v = parseFloat(value);
+  if(isNaN(v)) throw new Error(label + " must be a number.");
+  if(v < 0 || v > 100) throw new Error(label + " must be between 0 and 100.");
+  return v;
+}
+function validateQuantity(q){
+  const n = parseInt(q,10);
+  if(isNaN(n)) throw new Error("Quantity must be a whole number.");
+  if(n <= 0) throw new Error("Quantity must be greater than 0.");
+  if(n > 100) throw new Error("Quantity cannot exceed 100 per line item.");
+  return n;
+}
+
+/* ---------------- Menu operations ---------------- */
+function addMenuItemRaw(name, price, category){
+  const item = { id: nextMenuId++, name: validateName(name), price: validatePrice(price), category: validateCategory(category) };
+  menu.push(item);
+  return item;
+}
+function addMenuItem(){
+  const msg = document.getElementById('menuFormMsg');
+  msg.innerHTML = "";
+  try{
+    const name = document.getElementById('miName').value;
+    const price = document.getElementById('miPrice').value;
+    const category = document.getElementById('miCategory').value;
+    addMenuItemRaw(name, price, category);
+    document.getElementById('miName').value = "";
+    document.getElementById('miPrice').value = "";
+    msg.innerHTML = '<div class="success-msg">Added to menu.</div>';
+    renderMenu(); renderTicket();
+  }catch(e){
+    msg.innerHTML = '<div class="error-msg">' + e.message + '</div>';
+  }
+}
+function deleteMenuItem(id){
+  menu = menu.filter(m => m.id !== id);
+  renderMenu();
+}
+function getMenuItem(id){ return menu.find(m => m.id === id); }
+
+/* ---------------- Order operations ---------------- */
+function createOrderRaw(table, taxPercent){
+  const order = {
+    id: nextOrderId++,
+    table: validateTable(table),
+    items: [],
+    discount: 0,
+    tax: validatePercent(taxPercent, "Tax"),
+    status: "Open",
+    createdAt: new Date()
+  };
+  orders.push(order);
+  return order;
+}
+function startOrder(){
+  const msg = document.getElementById('ticketFormMsg');
+  msg.innerHTML = "";
+  try{
+    const table = document.getElementById('tableInput').value;
+    const order = createOrderRaw(table, 5.0);
+    activeOrderId = order.id;
+    document.getElementById('tableInput').value = "";
+    renderTicket(); renderOrders();
+  }catch(e){
+    msg.innerHTML = '<div class="error-msg">' + e.message + '</div>';
+  }
+}
+function getOrder(id){ return orders.find(o => o.id === id); }
+
+function addItemToOrderRaw(order, itemId, qty){
+  const menuItem = getMenuItem(itemId);
+  if(!menuItem) throw new Error("Menu item not found.");
+  const q = validateQuantity(qty);
+  const existing = order.items.find(li => li.itemId === itemId);
+  if(existing){
+    existing.qty = validateQuantity(existing.qty + q);
+  } else {
+    order.items.push({ itemId, name: menuItem.name, unitPrice: menuItem.price, qty: q });
+  }
+}
+function addItemToActiveOrder(itemId){
+  const order = getOrder(activeOrderId);
+  if(!order){ flashTicketMsg("Start or select an order first.", true); return; }
+  if(order.status !== "Open"){ flashTicketMsg("This order is " + order.status.toLowerCase() + " and can't be modified.", true); return; }
+  try{
+    addItemToOrderRaw(order, itemId, 1);
+    renderTicket(); renderOrders();
+  }catch(e){ flashTicketMsg(e.message, true); }
+}
+function changeQty(itemId, delta){
+  const order = getOrder(activeOrderId);
+  if(!order || order.status !== "Open") return;
+  const line = order.items.find(li => li.itemId === itemId);
+  if(!line) return;
+  const newQty = line.qty + delta;
+  if(newQty <= 0){
+    order.items = order.items.filter(li => li.itemId !== itemId);
+  } else if(newQty <= 100){
+    line.qty = newQty;
+  }
+  renderTicket(); renderOrders();
+}
+function removeLine(itemId){
+  const order = getOrder(activeOrderId);
+  if(!order || order.status !== "Open") return;
+  order.items = order.items.filter(li => li.itemId !== itemId);
+  renderTicket(); renderOrders();
+}
+function updateDiscount(val){
+  const order = getOrder(activeOrderId);
+  if(!order) return;
+  try{
+    order.discount = validatePercent(val, "Discount");
+    document.getElementById('ticketFormMsg').innerHTML = "";
+  }catch(e){ flashTicketMsg(e.message, true); }
+  renderTicket();
+}
+function updateTax(val){
+  const order = getOrder(activeOrderId);
+  if(!order) return;
+  try{
+    order.tax = validatePercent(val, "Tax");
+    document.getElementById('ticketFormMsg').innerHTML = "";
+  }catch(e){ flashTicketMsg(e.message, true); }
+  renderTicket();
+}
+
+function orderMath(order){
+  const subtotal = order.items.reduce((s,li)=> s + li.unitPrice*li.qty, 0);
+  const discountAmount = subtotal * (order.discount/100);
+  const taxable = subtotal - discountAmount;
+  const taxAmount = taxable * (order.tax/100);
+  const total = taxable + taxAmount;
+  return {
+    subtotal: round2(subtotal), discountAmount: round2(discountAmount),
+    taxable: round2(taxable), taxAmount: round2(taxAmount), total: round2(total)
+  };
+}
+function round2(n){ return Math.round(n*100)/100; }
+
+function billOrderRaw(order){
+  if(order.items.length === 0) throw new Error("Cannot bill an order with no items.");
+  order.status = "Billed";
+}
+function buildReceiptText(order){
+  const math = orderMath(order);
+  const line = (label, value) => label.padEnd(28, ' ') + value;
+  let lines = [];
+  lines.push("========================================");
+  lines.push("        LAZEEZ-E-HYDERABADI");
+  lines.push("           RESTAURANT RECEIPT");
+  lines.push("========================================");
+  lines.push(`Order #: ${order.id}    Table: ${order.table}`);
+  lines.push(`Date: ${formatDate(order.createdAt)}`);
+  lines.push(`Status: ${order.status}`);
+  lines.push("----------------------------------------");
+  order.items.forEach(li => {
+    const name = li.name.length > 20 ? li.name.slice(0,20) : li.name.padEnd(20,' ');
+    const sub = ('$' + (li.unitPrice*li.qty).toFixed(2)).padStart(10);
+    lines.push(`${name} x${String(li.qty).padEnd(3)}${sub}`);
+  });
+  lines.push("----------------------------------------");
+  lines.push(line("Subtotal:", '$' + math.subtotal.toFixed(2)));
+  if(order.discount > 0){
+    lines.push(line(`Discount (${order.discount}%):`, '-$' + math.discountAmount.toFixed(2)));
+  }
+  lines.push(line(`Tax (${order.tax}%):`, '$' + math.taxAmount.toFixed(2)));
+  lines.push("========================================");
+  lines.push(line("TOTAL:", '$' + math.total.toFixed(2)));
+  lines.push("========================================");
+  lines.push("*** THANK YOU ***");
+  return lines.join("\n");
+}
+function downloadReceipt(orderId){
+  const order = getOrder(orderId);
+  if(!order) return;
+  const text = buildReceiptText(order);
+  const blob = new Blob([text], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `Lazeez-e-Hyderabadi_Receipt_Order${order.id}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+function fireAndBill(){
+  const order = getOrder(activeOrderId);
+  if(!order) return;
+  try{
+    billOrderRaw(order);
+    renderTicket(true);
+    renderOrders();
+  }catch(e){ flashTicketMsg(e.message, true); }
+}
+function cancelActiveOrder(){
+  const order = getOrder(activeOrderId);
+  if(!order) return;
+  order.status = "Cancelled";
+  renderTicket(); renderOrders();
+}
+function selectOrder(id){
+  activeOrderId = id;
+  renderTicket();
+  renderOrders();
+}
+function flashTicketMsg(text, isError){
+  const msg = document.getElementById('ticketFormMsg');
+  msg.innerHTML = '<div class="' + (isError ? 'error-msg' : 'success-msg') + '">' + text + '</div>';
+}
+
+/* ---------------- Rendering ---------------- */
+function renderMenu(){
+  document.getElementById('menuCount').textContent = menu.length + (menu.length===1?" item":" items");
+  const search = document.getElementById('menuSearch').value.trim().toLowerCase();
+  const catFilter = document.getElementById('menuCategoryFilter').value;
+  let items = menu.filter(m => (!search || m.name.toLowerCase().includes(search)) && (!catFilter || m.category === catFilter));
+
+  const list = document.getElementById('menuList');
+  if(items.length === 0){
+    list.innerHTML = '<div class="empty-hint">No menu items match.</div>';
+    return;
+  }
+  list.innerHTML = items.map(m => `
+    <div class="menu-item-card">
+      <div class="menu-item-info">
+        <span class="name">${escapeHtml(m.name)}</span>
+        <span class="meta"><span class="category-pill">${m.category}</span></span>
+      </div>
+      <div style="display:flex;align-items:center;">
+        <span class="menu-item-price">$${m.price.toFixed(2)}</span>
+        <button class="btn-brass btn-small" style="margin-right:6px;" onclick="addItemToActiveOrder(${m.id})" title="Add to current ticket">+ Add</button>
+        <button class="btn-ghost btn-small" onclick="deleteMenuItem(${m.id})" title="Remove from menu">✕</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderTicket(justBilled){
+  const container = document.getElementById('ticketBody');
+  const order = getOrder(activeOrderId);
+  const statusCountEl = document.getElementById('ticketStatusCount');
+
+  if(!order){
+    statusCountEl.textContent = "";
+    container.innerHTML = '<div class="no-order">No active ticket. Start a new order for a table above, or select an open order from the Ticket Rail →</div>';
+    return;
+  }
+  statusCountEl.textContent = "#" + order.id;
+
+  const math = orderMath(order);
+  const isOpen = order.status === "Open";
+
+  let itemsHtml = order.items.length === 0
+    ? '<div class="empty-hint">No items yet. Add items from the Menu Board.</div>'
+    : order.items.map(li => `
+      <div class="line-item">
+        <span class="li-name">${escapeHtml(li.name)}</span>
+        ${isOpen ? `
+        <div class="qty-stepper">
+          <button onclick="changeQty(${li.itemId}, -1)">−</button>
+          <span class="qty-val">${li.qty}</span>
+          <button onclick="changeQty(${li.itemId}, 1)">+</button>
+        </div>` : `<span class="qty-val">x${li.qty}</span>`}
+        <span class="li-subtotal">$${(li.unitPrice*li.qty).toFixed(2)}</span>
+        ${isOpen ? `<button class="li-remove" onclick="removeLine(${li.itemId})" title="Remove">✕</button>` : ''}
+      </div>
+    `).join('');
+
+  let receiptHtml = "";
+  if(order.status === "Billed"){
+    receiptHtml = `
+      <div class="print-slot"></div>
+      <div class="receipt-wrap printed" id="receiptWrap">
+        <div class="receipt">
+          <div class="center r-title">LAZEEZ-E-HYDERABADI</div>
+          <div class="center">Restaurant Receipt</div>
+          <hr>
+          <div>Order #${order.id}    Table ${order.table}</div>
+          <div>${formatDate(order.createdAt)}</div>
+          <div>Status: ${order.status}</div>
+          <hr>
+          ${order.items.map(li => `<div class="r-line"><span>${padName(li.name)} x${li.qty}</span><span>$${(li.unitPrice*li.qty).toFixed(2).padStart(8)}</span></div>`).join('')}
+          <hr>
+          <div class="r-line"><span>Subtotal</span><span>$${math.subtotal.toFixed(2).padStart(8)}</span></div>
+          ${order.discount > 0 ? `<div class="r-line"><span>Discount (${order.discount}%)</span><span>-$${math.discountAmount.toFixed(2).padStart(7)}</span></div>` : ''}
+          <div class="r-line"><span>Tax (${order.tax}%)</span><span>$${math.taxAmount.toFixed(2).padStart(8)}</span></div>
+          <hr>
+          <div class="r-line r-total"><span>TOTAL</span><span>$${math.total.toFixed(2).padStart(8)}</span></div>
+          <div class="center" style="margin-top:10px;">*** THANK YOU ***</div>
+        </div>
+        <button class="btn-brass btn-block" style="margin-top:10px;" onclick="downloadReceipt(${order.id})">⬇ Download Receipt</button>
+      </div>
+    `;
+  }
+
+  container.innerHTML = `
+    <div class="panel">
+      <div class="ticket-active-header">
+        <span>TABLE ${escapeHtml(order.table)}</span>
+        <span class="status-badge status-${order.status}">${order.status}</span>
+      </div>
+      <div style="margin-top:10px;">${itemsHtml}</div>
+    </div>
+
+    ${isOpen ? `
+    <div class="panel">
+      <div class="discount-tax-row">
+        <div class="field">
+          <label for="discountInput">Discount %</label>
+          <input type="number" id="discountInput" min="0" max="100" value="${order.discount}" onchange="updateDiscount(this.value)">
+        </div>
+        <div class="field">
+          <label for="taxInput">Tax %</label>
+          <input type="number" id="taxInput" min="0" max="100" value="${order.tax}" onchange="updateTax(this.value)">
+        </div>
+      </div>
+      <div class="totals-block">
+        <div class="totals-row"><span>Subtotal</span><span>$${math.subtotal.toFixed(2)}</span></div>
+        <div class="totals-row"><span>Discount</span><span>-$${math.discountAmount.toFixed(2)}</span></div>
+        <div class="totals-row"><span>Tax</span><span>$${math.taxAmount.toFixed(2)}</span></div>
+        <div class="totals-row grand"><span>TOTAL</span><span>$${math.total.toFixed(2)}</span></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <button class="btn-brass btn-block" ${order.items.length===0?'disabled':''} onclick="fireAndBill()">🔥 Fire &amp; Bill</button>
+        <button class="btn-red" onclick="cancelActiveOrder()">Cancel</button>
+      </div>
+    </div>` : ''}
+
+    ${receiptHtml}
+  `;
+}
+
+function renderOrders(){
+  document.getElementById('orderCount').textContent = orders.length + (orders.length===1?" order":" orders");
+
+  // stats
+  const billed = orders.filter(o=>o.status==="Billed");
+  const revenue = billed.reduce((s,o)=> s + orderMath(o).total, 0);
+  const avg = billed.length ? revenue/billed.length : 0;
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-box"><div class="num">$${revenue.toFixed(2)}</div><div class="lbl">Revenue</div></div>
+    <div class="stat-box"><div class="num">${billed.length}</div><div class="lbl">Billed</div></div>
+    <div class="stat-box"><div class="num">${orders.filter(o=>o.status==="Open").length}</div><div class="lbl">Open</div></div>
+    <div class="stat-box"><div class="num">$${avg.toFixed(2)}</div><div class="lbl">Avg Order</div></div>
+  `;
+
+  const statusFilter = document.getElementById('statusFilter').value;
+  const sortMode = document.getElementById('orderSort').value;
+  let list = orders.filter(o => !statusFilter || o.status === statusFilter);
+
+  if(sortMode === "total-desc") list = [...list].sort((a,b)=> orderMath(b).total - orderMath(a).total);
+  else if(sortMode === "total-asc") list = [...list].sort((a,b)=> orderMath(a).total - orderMath(b).total);
+  else list = [...list].sort((a,b)=> b.id - a.id);
+
+  const container = document.getElementById('ordersList');
+  if(list.length === 0){
+    container.innerHTML = '<div class="empty-hint">No orders match.</div>';
+    return;
+  }
+  container.innerHTML = list.map(o => {
+    const math = orderMath(o);
+    const sel = o.id === activeOrderId ? " sel" : "";
+    return `
+    <div class="order-card st-${o.status}${sel}" onclick="selectOrder(${o.id})">
+      <div class="order-card-top">
+        <span>#${o.id} · Table ${escapeHtml(o.table)}</span>
+        <span class="status-badge status-${o.status}">${o.status}</span>
+      </div>
+      <div class="order-card-bottom">
+        <span>${o.items.length} item(s) · ${formatTime(o.createdAt)}</span>
+        <span class="oc-total">$${math.total.toFixed(2)}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ---------------- Utilities ---------------- */
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+function padName(name){
+  name = name.length > 18 ? name.slice(0,18) : name;
+  return name.padEnd(18, ' ');
+}
+function formatDate(d){
+  return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+}
+function formatTime(d){
+  return d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+}
+function tickClock(){
+  document.getElementById('clockText').textContent = new Date().toLocaleTimeString();
+}
+
+/* ---------------- Init ---------------- */
+seed();
+renderMenu();
+renderTicket();
+renderOrders();
+tickClock();
+setInterval(tickClock, 1000);
+</script>
+</body>
+</html>

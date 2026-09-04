@@ -1,0 +1,173 @@
+{
+  "next_id": 29,
+  "menu": [
+    {
+      "item_id": 1,
+      "name": "Chicken Seekh Kebab",
+      "price": 210.0,
+      "category": "Starter"
+    },
+    {
+      "item_id": 2,
+      "name": "Mutton Seekh Kebab",
+      "price": 240.0,
+      "category": "Starter"
+    },
+    {
+      "item_id": 3,
+      "name": "Chicken 65",
+      "price": 200.0,
+      "category": "Starter"
+    },
+    {
+      "item_id": 4,
+      "name": "Mutton Fry",
+      "price": 260.0,
+      "category": "Starter"
+    },
+    {
+      "item_id": 5,
+      "name": "Hyderabadi Chicken Biryani",
+      "price": 250.0,
+      "category": "Main"
+    },
+    {
+      "item_id": 6,
+      "name": "Hyderabadi Mutton Biryani",
+      "price": 320.0,
+      "category": "Main"
+    },
+    {
+      "item_id": 7,
+      "name": "Vegetable Biryani",
+      "price": 180.0,
+      "category": "Main"
+    },
+    {
+      "item_id": 8,
+      "name": "Egg Biryani",
+      "price": 150.0,
+      "category": "Main"
+    },
+    {
+      "item_id": 9,
+      "name": "Chicken Curry",
+      "price": 220.0,
+      "category": "Main"
+    },
+    {
+      "item_id": 10,
+      "name": "Chicken Korma",
+      "price": 240.0,
+      "category": "Main"
+    },
+    {
+      "item_id": 11,
+      "name": "Butter Chicken",
+      "price": 270.0,
+      "category": "Main"
+    },
+    {
+      "item_id": 12,
+      "name": "Chicken Tikka Masala",
+      "price": 260.0,
+      "category": "Main"
+    },
+    {
+      "item_id": 13,
+      "name": "Chicken Chettinad",
+      "price": 250.0,
+      "category": "Main"
+    },
+    {
+      "item_id": 14,
+      "name": "Mutton Curry",
+      "price": 280.0,
+      "category": "Main"
+    },
+    {
+      "item_id": 15,
+      "name": "Mutton Korma",
+      "price": 300.0,
+      "category": "Main"
+    },
+    {
+      "item_id": 16,
+      "name": "Mutton Rogan Josh",
+      "price": 320.0,
+      "category": "Main"
+    },
+    {
+      "item_id": 17,
+      "name": "Mutton Kheema",
+      "price": 260.0,
+      "category": "Main"
+    },
+    {
+      "item_id": 18,
+      "name": "Mutton Chukka",
+      "price": 290.0,
+      "category": "Main"
+    },
+    {
+      "item_id": 19,
+      "name": "Chicken Shawarma Roll",
+      "price": 150.0,
+      "category": "Main"
+    },
+    {
+      "item_id": 20,
+      "name": "Mutton Shawarma Roll",
+      "price": 180.0,
+      "category": "Main"
+    },
+    {
+      "item_id": 21,
+      "name": "Chicken Shawarma Plate",
+      "price": 220.0,
+      "category": "Main"
+    },
+    {
+      "item_id": 22,
+      "name": "Double Ka Meetha",
+      "price": 90.0,
+      "category": "Dessert"
+    },
+    {
+      "item_id": 23,
+      "name": "Qubani Ka Meetha",
+      "price": 100.0,
+      "category": "Dessert"
+    },
+    {
+      "item_id": 24,
+      "name": "Coca-Cola",
+      "price": 40.0,
+      "category": "Beverage"
+    },
+    {
+      "item_id": 25,
+      "name": "Sprite",
+      "price": 40.0,
+      "category": "Beverage"
+    },
+    {
+      "item_id": 26,
+      "name": "Mango Lassi",
+      "price": 60.0,
+      "category": "Beverage"
+    },
+    {
+      "item_id": 27,
+      "name": "Sweet Lassi",
+      "price": 50.0,
+      "category": "Beverage"
+    },
+    {
+      "item_id": 28,
+      "name": "Masala Soda",
+      "price": 45.0,
+      "category": "Beverage"
+    }
+  ]
+}

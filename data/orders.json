@@ -1,0 +1,61 @@
+{
+  "next_id": 3,
+  "orders": [
+    {
+      "order_id": 1,
+      "table_number": "T04",
+      "items": [
+        {
+          "item_id": 5,
+          "name": "Hyderabadi Chicken Biryani",
+          "unit_price": 250.0,
+          "quantity": 2,
+          "subtotal": 500.0
+        },
+        {
+          "item_id": 24,
+          "name": "Coca-Cola",
+          "unit_price": 40.0,
+          "quantity": 2,
+          "subtotal": 80.0
+        }
+      ],
+      "discount_percent": 10.0,
+      "tax_percent": 5.0,
+      "status": "Billed",
+      "created_at": "2026-08-26 20:00:33",
+      "subtotal": 580.0,
+      "discount_amount": 58.0,
+      "tax_amount": 26.1,
+      "total": 548.1
+    },
+    {
+      "order_id": 2,
+      "table_number": "T07",
+      "items": [
+        {
+          "item_id": 6,
+          "name": "Hyderabadi Mutton Biryani",
+          "unit_price": 320.0,
+          "quantity": 1,
+          "subtotal": 320.0
+        },
+        {
+          "item_id": 20,
+          "name": "Mutton Shawarma Roll",
+          "unit_price": 180.0,
+          "quantity": 2,
+          "subtotal": 360.0
+        }
+      ],
+      "discount_percent": 0.0,
+      "tax_percent": 5.0,
+      "status": "Open",
+      "created_at": "2026-08-26 20:00:33",
+      "subtotal": 680.0,
+      "discount_amount": 0.0,
+      "tax_amount": 34.0,
+      "total": 714.0
+    }
+  ]
+}

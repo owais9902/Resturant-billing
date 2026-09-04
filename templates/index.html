@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - Restaurant Billing{% endblock %}
+{% block content %}
+
+<div class="card">
+  <div class="grid">
+    <div class="stat"><div class="num">{{ summary.billed_orders }}</div><div class="lbl">Billed</div></div>
+    <div class="stat"><div class="num">{{ summary.open_orders }}</div><div class="lbl">Open</div></div>
+    <div class="stat"><div class="num">{{ summary.cancelled_orders }}</div><div class="lbl">Cancelled</div></div>
+    <div class="stat"><div class="num">${{ "%.2f"|format(summary.total_revenue) }}</div><div class="lbl">Revenue</div></div>
+    <div class="stat"><div class="num">${{ "%.2f"|format(summary.average_order_value) }}</div><div class="lbl">Avg Order</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2 style="margin-top:0;">Start New Order</h2>
+  <form method="post" action="{{ url_for('create_order') }}" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
+    <div class="field">
+      <label>Table number</label>
+      <input type="text" name="table" placeholder="e.g. T04" required>
+    </div>
+    <div class="field">
+      <label>Tax %</label>
+      <input type="number" name="tax" value="5.0" step="0.1" min="0" max="100">
+    </div>
+    <button class="btn" type="submit">Create Order</button>
+  </form>
+</div>
+
+<div class="card">
+  <h2 style="margin-top:0;">Menu</h2>
+  {% if menu %}
+  <table>
+    <thead><tr><th>ID</th><th>Name</th><th>Category</th><th>Price</th><th></th></tr></thead>
+    <tbody>
+      {% for m in menu %}
+      <tr>
+        <td>{{ m.item_id }}</td>
+        <td>{{ m.name }}</td>
+        <td>{{ m.category }}</td>
+        <td>${{ "%.2f"|format(m.price) }}</td>
+        <td>
+          <form class="inline" method="post" action="{{ url_for('delete_menu_item', item_id=m.item_id) }}" onsubmit="return confirm('Delete this item?');">
+            <button class="btn btn-small btn-red" type="submit">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>No menu items yet. <a href="{{ url_for('add_menu_item') }}">Add one</a>.</p>
+  {% endif %}
+</div>
+
+<div class="card">
+  <div class="toolbar">
+    <h2 style="margin:0;flex:1;">Ticket Rail (Orders)</h2>
+    <form method="get" action="{{ url_for('index') }}" style="display:flex;gap:8px;">
+      <select name="status" onchange="this.form.submit()">
+        <option value="" {% if not status %}selected{% endif %}>All statuses</option>
+        <option value="Open" {% if status=='Open' %}selected{% endif %}>Open</option>
+        <option value="Billed" {% if status=='Billed' %}selected{% endif %}>Billed</option>
+        <option value="Cancelled" {% if status=='Cancelled' %}selected{% endif %}>Cancelled</option>
+      </select>
+      <select name="sort" onchange="this.form.submit()">
+        <option value="order_id" {% if sort_key=='order_id' %}selected{% endif %}>Sort: ID</option>
+        <option value="total" {% if sort_key=='total' %}selected{% endif %}>Sort: Total</option>
+        <option value="table_number" {% if sort_key=='table_number' %}selected{% endif %}>Sort: Table</option>
+      </select>
+    </form>
+  </div>
+
+  {% if orders %}
+  <table>
+    <thead><tr><th>Order</th><th>Table</th><th>Status</th><th>Total</th><th></th></tr></thead>
+    <tbody>
+      {% for o in orders %}
+      <tr>
+        <td>#{{ o.order_id }}</td>
+        <td>{{ o.table_number }}</td>
+        <td><span class="badge badge-{{ o.status }}">{{ o.status }}</span></td>
+        <td>${{ "%.2f"|format(o.total) }}</td>
+        <td><a class="btn btn-small btn-ghost" href="{{ url_for('view_order', order_id=o.order_id) }}">Open</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>No orders match.</p>
+  {% endif %}
+</div>
+
+{% endblock %}

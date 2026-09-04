@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Add Menu Item - Restaurant Billing{% endblock %}
+{% block content %}
+
+<div class="card">
+  <h2 style="margin-top:0;">Add Menu Item</h2>
+  <form method="post" action="{{ url_for('add_menu_item') }}" style="max-width:380px;">
+    <div class="field">
+      <label>Item name</label>
+      <input type="text" name="name" value="{{ name or '' }}" required style="width:100%;">
+    </div>
+    <div class="field">
+      <label>Price</label>
+      <input type="number" name="price" value="{{ price or '' }}" step="0.01" min="0.01" required style="width:100%;">
+    </div>
+    <div class="field">
+      <label>Category</label>
+      <select name="category" style="width:100%;">
+        {% for c in ['Starter','Main','Dessert','Beverage','Other'] %}
+        <option value="{{ c }}" {% if category==c %}selected{% endif %}>{{ c }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button class="btn" type="submit">Add Item</button>
+    <a class="btn btn-ghost" href="{{ url_for('index') }}">Cancel</a>
+  </form>
+</div>
+
+{% endblock %}
